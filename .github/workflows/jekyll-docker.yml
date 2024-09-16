@@ -108,22 +108,10 @@ jobs:
         run: |
           aws s3 cp frontend/dist/ s3://mydata-venkey/${{ inputs.environment }}/ --recursive
           echo "Angular Build deployed to S3 under environment: ${{ inputs.environment }}."
-          
-      - name: Generate Deployment Report
+      - name: Generate Deployment Summary
         run: |
-          REPORT_FILE="angular_deploy_report_${{ inputs.environment }}_$(date +'%Y%m%d_%H%M%S').txt"
-          echo "Angular Deployment Report for environment: ${{ inputs.environment }}" > $REPORT_FILE
-          echo "===================" >> $REPORT_FILE
-          echo "Date: $(date)" >> $REPORT_FILE
-          echo "Deployment Status: SUCCESS" >> $REPORT_FILE
-          echo "Details:" >> $REPORT_FILE
-          echo "Deployment logs:" >> $REPORT_FILE
-          echo "No logs available" >> $REPORT_FILE
-          mv $REPORT_FILE angular_deploy_report.txt
-          echo "Angular Deployment Report generated."
-
-      - name: Upload Frontend Deployment Report
-        uses: actions/upload-artifact@v3
-        with:
-          name: angular-deploy-report
-          path: angular_deploy_report.txt
+          echo "### Infra Deployment Report" >> $GITHUB_STEP_SUMMARY
+          echo "| Run Number | Environment | Author | Deploy Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|-------------|--------|---------------|" >> $GITHUB_STEP_SUMMARY
+          echo "| ${{ github.run_number }} | ${{ inputs.environment }} | ${{ github.actor }} | success |" >> $GITHUB_STEP_SUMMARY
+          echo "Job summary generated at run-time" >> $GITHUB_STEP_SUMMARY
