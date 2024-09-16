@@ -1,0 +1,122 @@
+name: Build and Deploy Projects
+run-name: Release Name --> ${{ github.event.release.name }} // Description --> ${{ github.event.release.body }} // Change Request --> ${{ github.event.head_commit.message }} // Deployer --> @${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "The environment to deploy to (e.g., dev, feature)"
+        required: true
+        type: string
+      working_dir:
+        description: "The working directory (Frontend or Backend)"
+        required: true
+        type: string
+
+jobs:
+  build_and_deploy_backend:
+    if: ${{ inputs.working_dir == 'backend' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::992382681841:oidc-provider/token.actions.githubusercontent.com
+          aws-region: us-east-1
+
+      - name: Build Backend (Lambda FastAPI)
+        run: |
+          echo "Building and deploying Backend (Lambda FastAPI) for environment: ${{ inputs.environment }}..."
+          
+          # Set Up Python
+          python -m pip install --upgrade pip
+          pip install -r Backend/requirements.txt
+
+          # Package Lambda Function
+          mkdir -p lambda_package
+          cp -r Backend/app lambda_package/
+          cp Backend/requirements.txt lambda_package/
+          cd lambda_package
+          pip install -r requirements.txt -t .
+          zip -r ../lambda_function.zip .
+
+          # Deploy Lambda to AWS S3
+          aws s3 cp lambda_function.zip s3://mydata-venkey/${{ inputs.environment }}/
+          echo "Lambda Function deployed to S3 under environment: ${{ inputs.environment }}."
+          
+          # Generate Deployment Report
+          REPORT_FILE="lambda_deploy_report_${{ inputs.environment }}_$(date +'%Y%m%d_%H%M%S').txt"
+          echo "Lambda Deployment Report for environment: ${{ inputs.environment }}" > $REPORT_FILE
+          echo "===================" >> $REPORT_FILE
+          echo "Date: $(date)" >> $REPORT_FILE
+          echo "Deployment Status: SUCCESS" >> $REPORT_FILE
+          echo "Details:" >> $REPORT_FILE
+          echo "Deployment logs:" >> $REPORT_FILE
+          echo "No logs available" >> $REPORT_FILE
+          mv $REPORT_FILE lambda_deploy_report.txt
+          echo "Lambda Deployment Report generated."
+
+      - name: Upload Backend Deployment Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: lambda-deploy-report
+          path: lambda_deploy_report.txt
+
+  build_and_deploy_frontend:
+    if: ${{ inputs.working_dir == 'frontend' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::992382681841:oidc-provider/token.actions.githubusercontent.com
+          aws-region: us-east-1
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '17.x'
+
+      - name: Install Dependencies
+        run: |
+          cd Frontend
+          npm install
+
+      - name: Build Frontend (Angular)
+        run: |
+          cd Frontend
+          npm run build:dev
+
+      - name: Deploy Angular Build to AWS S3
+        run: |
+          aws s3 cp frontend/dist/ s3://mydata-venkey/${{ inputs.environment }}/ --recursive
+          echo "Angular Build deployed to S3 under environment: ${{ inputs.environment }}."
+          
+      - name: Generate Deployment Report
+        run: |
+          REPORT_FILE="angular_deploy_report_${{ inputs.environment }}_$(date +'%Y%m%d_%H%M%S').txt"
+          echo "Angular Deployment Report for environment: ${{ inputs.environment }}" > $REPORT_FILE
+          echo "===================" >> $REPORT_FILE
+          echo "Date: $(date)" >> $REPORT_FILE
+          echo "Deployment Status: SUCCESS" >> $REPORT_FILE
+          echo "Details:" >> $REPORT_FILE
+          echo "Deployment logs:" >> $REPORT_FILE
+          echo "No logs available" >> $REPORT_FILE
+          mv $REPORT_FILE angular_deploy_report.txt
+          echo "Angular Deployment Report generated."
+
+      - name: Upload Frontend Deployment Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: angular-deploy-report
+          path: angular_deploy_report.txt
