@@ -12,6 +12,10 @@ on:
         description: "The working directory (Frontend or Backend)"
         required: true
         type: string
+      branch:
+        description: "Select the respective branch"
+        required: true
+        type: string
 permissions:
   id-token: write
   contents: read
@@ -98,7 +102,7 @@ jobs:
       - name: Build Frontend (Angular)
         run: |
           cd frontend
-          npm run build:dev
+          npm run build:${{ inputs.environment }}
 
       - name: Deploy Angular Build to AWS S3
         run: |
