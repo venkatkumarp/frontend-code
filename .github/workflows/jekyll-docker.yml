@@ -1,6 +1,8 @@
 name: Build and Deploy Projects
 run-name: Release Name --> ${{ github.event.release.name }} // Description --> ${{ github.event.release.body }} // Change Request --> ${{ github.event.head_commit.message }} // Deployer --> @${{ github.actor }}
+#AKIA6ODU6ALY7VI4G3HN
 
+#tj6vshVoBLNDWlIdbf426nMS9C/VKViZrG/iK+Be
 on:
   workflow_dispatch:
     inputs:
