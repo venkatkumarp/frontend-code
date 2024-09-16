@@ -13,7 +13,6 @@ on:
         required: true
         type: string
 permissions:
-  id-token: write
   contents: read
 jobs:
   build_and_deploy_backend:
@@ -26,10 +25,10 @@ jobs:
           fetch-depth: 0
 
       - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: arn:aws:iam::992382681841:role/github-oidc-role
-          aws-region: us-east-1
+        env:
+          AWS_ACCESS_KEY_ID: "your-access-key-id"
+          AWS_SECRET_ACCESS_KEY: "your-secret-access-key"
+        run: echo "AWS credentials are set."
 
       - name: Build Backend (Lambda FastAPI)
         run: |
@@ -79,11 +78,10 @@ jobs:
           fetch-depth: 0
 
       - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          role-to-assume: arn:aws:iam::992382681841:role/github-oidc-role
-          aws-region: us-east-1
-          role-session-name: GithubActionsSession
+        env:
+          AWS_ACCESS_KEY_ID: "AKIA6ODU6ALY7VI4G3HN"
+          AWS_SECRET_ACCESS_KEY: "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"
+        run: echo "AWS credentials are set."
 
       - name: Set Up Node.js
         uses: actions/setup-node@v4
