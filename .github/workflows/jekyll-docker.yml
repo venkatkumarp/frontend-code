@@ -90,12 +90,12 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          cd Frontend
+          cd frontend
           npm install
 
       - name: Build Frontend (Angular)
         run: |
-          cd Frontend
+          cd frontend
           npm run build:dev
 
       - name: Deploy Angular Build to AWS S3
