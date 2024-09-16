@@ -100,7 +100,7 @@ jobs:
 
       - name: Deploy Angular Build to AWS S3
         run: |
-          aws s3 cp frontend/dist/ s3://mydata-venkey/${{ inputs.environment }}/ --recursive
+          aws s3 cp frontend/dist/ s3://mydata-venkey/dev/ --recursive
           echo "Angular Build deployed to S3 under environment: ${{ inputs.environment }}."
           
       - name: Generate Deployment Report
