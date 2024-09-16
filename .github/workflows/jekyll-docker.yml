@@ -81,6 +81,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::992382681841:oidc-provider/token.actions.githubusercontent.com
           aws-region: us-east-1
+          role-session-name: GithubActionsSession
 
       - name: Set Up Node.js
         uses: actions/setup-node@v4
