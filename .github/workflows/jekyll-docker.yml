@@ -102,6 +102,7 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: "AKIA6ODU6ALY7VI4G3HN"
           AWS_SECRET_ACCESS_KEY: "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"
+          AWS_DEFAULT_REGION: 'us-east-1'
         run: |
           aws s3 cp frontend/dist/ s3://mydata-venkey/dev/ --recursive
           echo "Angular Build deployed to S3 under environment: ${{ inputs.environment }}."
