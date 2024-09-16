@@ -79,7 +79,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: arn:aws:iam::992382681841:role/github-oidc-role
           aws-region: us-east-1
